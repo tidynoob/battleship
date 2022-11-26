@@ -77,8 +77,15 @@ const gameboard = () => {
 
   const allSunk = () => board.every((row) => row.every((cell) => cell === null || cell.isSunk()));
 
+  const resetBoard = () => {
+    _count = 0;
+    _hitSpots.length = 0;
+    _missedSpots.length = 0;
+    board.forEach((row) => row.fill(null));
+  };
+
   return {
-    board, placeShip, hit, getHitSpots, getMissedSpots, allSunk,
+    board, placeShip, hit, getHitSpots, getMissedSpots, allSunk, resetBoard,
   };
 };
 

@@ -100,3 +100,16 @@ test("gameboard properly checks if all ships are sunk", () => {
   testBoard.hit(3,0);
   expect(testBoard.allSunk()).toBe(true);
 });
+
+test("gameboard can reset", () => {
+  testBoard.resetBoard();
+  expect(testBoard.board).toEqual([
+    [null, null, null, null, null, null, null],
+    [null, null, null, null, null, null, null],
+    [null, null, null, null, null, null, null],
+    [null, null, null, null, null, null, null],
+    [null, null, null, null, null, null, null],
+    [null, null, null, null, null, null, null],
+    [null, null, null, null, null, null, null],
+  ]);
+});
