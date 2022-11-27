@@ -29,3 +29,10 @@ test('player can place ship on their board', () => {
     expect(player1.gameBoard.board[0][1]).not.toBeNull();
     expect(player1.gameBoard.board[0][2]).not.toBeNull();
 });
+
+test('player can attack another player', () => {
+    expect(() => player1.attack(player2, 0, 0)).toThrow();
+    expect(player2.gameBoard.getMissedSpots()).toContainEqual([0, 0]);
+    player2.attack(player1, 0, 0);
+    expect(player1.gameBoard.getHitSpots()).toContainEqual([0, 0]);
+});

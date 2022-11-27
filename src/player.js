@@ -6,8 +6,11 @@ const player = (playerName, type = 'user') => {
     let gameBoard = gameboard();
     const getName = () => _name;
     const getType = () => _type;
+    const attack = (enemy, x, y) => {
+        enemy.gameBoard.hit(x, y);
+    };
 
-    return { getName, getType, gameBoard };
+    return { getName, getType, gameBoard, attack };
 }
 
 export default player;
