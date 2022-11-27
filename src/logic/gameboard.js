@@ -3,10 +3,38 @@ import ship from './ship';
 const gameboard = () => {
   const board = new Array(7).fill(null).map(() => new Array(7).fill(null));
 
-  let _count = 0;
-
   const _hitSpots = [];
   const _missedSpots = [];
+
+  const _shipCount = {
+    carrier: {
+      length: 5,
+      max: 1,
+      count: 0,
+    },
+    battleship: {
+      length: 4,
+      max: 1,
+      count: 0,
+    },
+    submarine: {
+      length: 3,
+      max: 1,
+      count: 0,
+    },
+    destroyer: {
+      length: 2,
+      max: 2,
+      count: 0,
+    },
+  };
+
+  let _count = _shipCount.carrier.count
+    + _shipCount.battleship.count
+    + _shipCount.submarine.count
+    + _shipCount.destroyer.count;
+
+  const allShipsPlaced = () => _count === 5;
 
   const arraysEqual = (a, b) => {
     if (a === b) return true;
@@ -18,6 +46,8 @@ const gameboard = () => {
     }
     return true;
   };
+
+  const getShipCount = () => _shipCount;
 
   const getHitSpots = () => _hitSpots;
 
@@ -85,7 +115,7 @@ const gameboard = () => {
   };
 
   return {
-    board, placeShip, hit, getHitSpots, getMissedSpots, allSunk, resetBoard,
+    board, placeShip, hit, getHitSpots, getMissedSpots, allSunk, resetBoard, getShipCount, allShipsPlaced
   };
 };
 

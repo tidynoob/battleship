@@ -9,11 +9,12 @@ import Main from './components/Main';
 
 
 function App() {
+
   return (
     <ChakraProvider theme={theme}>
       <Box display="grid" gridTemplateRows="auto 1fr" minH="100vh">
         <Nav />
-        <Main gameStatus='Test Status'/>
+        <Main/>
       </Box>
     </ChakraProvider>
   );
