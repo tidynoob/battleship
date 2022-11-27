@@ -4,12 +4,17 @@ import {
   Box,
   theme,
 } from '@chakra-ui/react';
+import Nav from './components/Nav';
+import Main from './components/Main';
 
 
 function App() {
   return (
     <ChakraProvider theme={theme}>
-      <Box />
+      <Box display="grid" gridTemplateRows="auto 1fr" minH="100vh">
+        <Nav />
+        <Main gameStatus='Test Status'/>
+      </Box>
     </ChakraProvider>
   );
 }

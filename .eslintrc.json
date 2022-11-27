@@ -11,6 +11,7 @@
   },
   "plugins": ["react"],
   "rules": {
-    "react/jsx-filename-extension": ["warn", { "extensions": [".js", ".jsx"] }]
+    "react/jsx-filename-extension": ["warn", { "extensions": [".js", ".jsx"] }],
+    "react/prop-types": "off"
   }
 }
