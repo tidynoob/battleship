@@ -12,7 +12,7 @@ function App() {
 
   return (
     <ChakraProvider theme={theme}>
-      <Box display="grid" gridTemplateRows="auto 1fr" minH="100vh">
+      <Box display="grid" gridTemplateRows="auto 1fr">
         <Nav />
         <Main/>
       </Box>

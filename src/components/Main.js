@@ -3,12 +3,13 @@ import { Box, Button, Heading, useBoolean } from "@chakra-ui/react";
 import uniqid from 'uniqid';
 // import gameController from "../logic/gameController";
 import player from "../logic/player";
+import BattleShipGrid from "./BattleshipGrid";
+import UserBox from "./UserBox";
 
-function SubmitShipPlacement({gamePhase}) {
-    console.log(gamePhase);
+function SubmitShipPlacement({gamePhase, ...other}) {
     if (gamePhase === 'placement') {
         return (
-            <Button variant="solid" colorScheme="gray" w='250px'>Submit Ship Placement</Button>
+            <Button {...other} variant="solid" colorScheme="gray" w='250px'>Submit Ship Placement</Button>
         )
     }
     return null
@@ -20,13 +21,14 @@ function Main() {
     const [resetButtonDisabled, setResetButtonDisabled] = useBoolean(true);
     const [player1, setPlayer1] = useState(null);
     const [player2, setPlayer2] = useState(null);
+    const [player1Name, setPlayer1Name] = useState('');
     const [turnCount, setTurnCount] = useState(0);
     const [gamePhase, setGamePhase] = useState('');
     const [playerTurn, setPlayerTurn] = useState('');
 
     const takeTurn = (x,y) => {
         if (gamePhase !== 'active') return;
-        if (playerTurn() === 'player1') {
+        if (playerTurn === 'player1') {
             player1.attack(player2, x, y);
         } else {
             player2.attack(player1, x, y);
@@ -40,16 +42,17 @@ function Main() {
     };
 
     const startGame = () => {
-        setGameStatus('Place Ships');
-        setPlayer1(player('Player 1', 'user'));
-        setPlayer2(player('Computer', 'bot'));
         setGamePhase('placement');
+        setGameStatus('Place Ships');
+        setPlayer1(player(player1Name, 'user'));
+        setPlayer2(player('Computer', 'bot'));
         setStartButtonDisabled.on();
         setResetButtonDisabled.off();
     };
 
     const resetGame = () => {
-        setGamePhase('Game has been reset');
+        setGamePhase('');
+        setGameStatus('Game has been reset');
         setPlayer1({});
         setPlayer2({});
         setStartButtonDisabled.off();
@@ -65,16 +68,6 @@ function Main() {
         setGameStatus(`${playerTurn}'s turn`);
     };
 
-
-    const highlightBoard = (user) => {
-        if (user === null) return '1px';
-        if (playerTurn === user) {
-            return '5px'
-        } 
-            return '1px'
-        
-    };
-
     const handleTileClick = (e) => {
         const x = e.target.getAttribute('data-x');
         const y = e.target.getAttribute('data-y');
@@ -86,54 +79,16 @@ function Main() {
         };
     };
 
-    const boardArray = [ 
-        ['00', '10', '20', '30', '40', '50', '60'],
-        ['01', '11', '21', '31', '41', '51', '61'],
-        ['02', '12', '22', '32', '42', '52', '62'],
-        ['03', '13', '23', '33', '43', '53', '63'],
-        ['04', '14', '24', '34', '44', '54', '64'],
-        ['05', '15', '25', '35', '45', '55', '65'],
-        ['06', '16', '26', '36', '46', '56', '66'],
-    ];
-
-    const setupBoard = boardArray.map((row, yIndex) => {
-
-        const rowArray = row.map((cell,xIndex) => <Box 
-            key={uniqid()} 
-            data-x={xIndex} 
-            data-y={yIndex} 
-            onClick={handleTileClick}
-            w='50px' 
-            h="50px" 
-            borderWidth="1px" 
-            borderColor="gray.900"/>);
-
-        return (
-            <Box key={uniqid()} display='flex' justifyContent='space-between'>
-                {rowArray}
-            </Box>
-        )
-
-    });
-
-
-
     return (
-        <Box display='flex' flexDirection='column' alignItems='center' p={4} gap='4' >
-            <Box display="flex" gap='4' >
-                <Button colorScheme="gray" variant="solid" w='250px' onClick={startGame} isDisabled={startButtonDisabled}>Start</Button>
-                <Button colorScheme="gray" variant="outline" w='250px' onClick={resetGame} isDisabled={resetButtonDisabled}>Reset</Button>
-            </Box>
-            <Box display='flex' alignItems="center" justifyContent='space-evenly' gap="4" >
-                <Box id="player1" display='flex' flexDirection='column' alignItems='center' borderWidth={highlightBoard(player1)} borderColor="gray.900" shadow="base">
-                    {setupBoard}
-                </Box>
-                <Box id="player2" display='flex' flexDirection='column' alignItems='center' borderWidth={highlightBoard(player2)} borderColor="gray.900" shadow='base'>
-                    {setupBoard}
-                </Box>
-            </Box>
-            <Heading size='lg'>{gameStatus}</Heading>
-            <SubmitShipPlacement gamePhase={gamePhase}/>
+        <Box display='grid' gridTemplateColumns="350px 350px" p={4} gap='4' gridAutoRows="auto" maxW="container.lg" alignItems="center" margin="auto" >
+            <Button justifySelf="flex-end" colorScheme="gray" variant="solid" w='250px' onClick={startGame} isDisabled={startButtonDisabled}>Start</Button>
+            <Button justifySelf="flex-start" colorScheme="gray" variant="outline" w='250px' onClick={resetGame} isDisabled={resetButtonDisabled}>Reset</Button>
+            <UserBox justifySelf='center' gridColumn='1' playerName={player1Name} setPlayerName={setPlayer1Name} gamePhase={gamePhase} />
+            <Heading justifySelf="center" gridColumn="2" size="md">Computer</Heading>
+            <BattleShipGrid playerTurn={playerTurn} handleTileClick={handleTileClick} player='player1' gridColumn='1' />
+            <BattleShipGrid playerTurn={playerTurn} handleTileClick={handleTileClick} player='player2' gridColumn='2' />
+            <Heading justifySelf="center" gridColumn="1/-1" size='lg'>{gameStatus}</Heading>
+            <SubmitShipPlacement justifySelf='center' gridColumn='1/-1' gamePhase={gamePhase}/>
 
         </Box>
     )
