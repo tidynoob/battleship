@@ -5,6 +5,7 @@ const gameboard = () => {
 
   const _hitSpots = [];
   const _missedSpots = [];
+  const _filledSpots = [];
 
   const _shipCount = {
     carrier: {
@@ -53,7 +54,18 @@ const gameboard = () => {
 
   const getMissedSpots = () => _missedSpots;
 
+  const getFilledSpots = () => _filledSpots;
+
   const _makeID = () => _count++;
+
+  const isPlacable = (x, y, length, dir) => {
+    if (dir === 'h') {
+      if (x + length > 7) return false;
+    } else if (y + length > 7) return false;
+    if (_filledSpots.some((spot) => arraysEqual(spot, [x, y]))) return false;
+    return true;
+  };
+
 
   const placeShip = (x, y, length, direction) => {
     // check if there's already a ship there
@@ -73,13 +85,15 @@ const gameboard = () => {
     for (let i = 0; i < length; i++) {
       if (direction === 'v') {
         board[y + i][x] = ship(length, ID);
+        filledSpots.push([x, y + i]);
       } else if (direction === 'h') {
         board[y][x + i] = ship(length, ID);
+        filledSpots.push([x + i, y]);
       } else {
         return false;
       }
     }
-    return true;
+    return board;
   };
 
   const hit = (x, y) => {
@@ -105,6 +119,18 @@ const gameboard = () => {
     return true;
   };
 
+  const filledSpots = () => {
+    const spots = [];
+    board.map((row, y) => row.map((cell, x) => {
+      if (cell !== null) {
+        spots.push([x, y]);
+      }
+      return cell;
+    }));
+
+    return spots;
+  };
+
   const allSunk = () => board.every((row) => row.every((cell) => cell === null || cell.isSunk()));
 
   const resetBoard = () => {
@@ -115,7 +141,7 @@ const gameboard = () => {
   };
 
   return {
-    board, placeShip, hit, getHitSpots, getMissedSpots, allSunk, resetBoard, getShipCount, allShipsPlaced
+    board, placeShip, hit, getHitSpots, getMissedSpots, allSunk, resetBoard, getShipCount, allShipsPlaced, filledSpots, isPlacable
   };
 };
 

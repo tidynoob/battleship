@@ -10,7 +10,7 @@ function UserBox(props) {
     setPlayerName(e.target.value);
   };
 
-  if (gamePhase === "") {
+  if (gamePhase === "pregame") {
     return (
       <Box {...other}>
         <Input
