@@ -2,37 +2,87 @@ import React from "react";
 import { Box } from "@chakra-ui/react";
 import uniqid from 'uniqid';
 
-function BattleshipGrid({playerTurn, handleTileClick, player, ...other}) {
+function CellHover({x, y, shipList, rotation, gamePhase, isHit, isFilled}) {
+    // console.log(x, y, shipList, rotation, gamePhase, isHit, isFilled);
+    const ship = shipList[0];
+    let shipWidth;
+    let shipHeight;
+    if (rotation === 'h') {
+        shipWidth = Math.min(ship.length, (7 - x));
+        shipHeight = 1;
+    } else if (rotation === 'v') {
+        shipWidth = 1;
+        shipHeight = Math.min(ship.length, (7 - y));
+    };
 
-    const boardArray = [ 
-        ['00', '10', '20', '30', '40', '50', '60'],
-        ['01', '11', '21', '31', '41', '51', '61'],
-        ['02', '12', '22', '32', '42', '52', '62'],
-        ['03', '13', '23', '33', '43', '53', '63'],
-        ['04', '14', '24', '34', '44', '54', '64'],
-        ['05', '15', '25', '35', '45', '55', '65'],
-        ['06', '16', '26', '36', '46', '56', '66'],
-    ];
+    if (gamePhase === 'placement') {
 
-    const setupBoard = boardArray.map((row, yIndex) => {
-
-        const rowArray = row.map((cell,xIndex) => <Box 
-            key={uniqid()} 
-            data-x={xIndex} 
-            data-y={yIndex} 
-            onClick={handleTileClick}
-            w='50px' 
-            h="50px" 
-            borderWidth="1px" 
-            borderColor="gray.900"/>);
+        if (isFilled) {
+            return <Box />
+        }
 
         return (
-            <Box key={uniqid()} display='flex' justifyContent='space-between'>
-                {rowArray}
-            </Box>
-        )
+                <Box
+                    h="100%"
+                    w="100%"
+                    position="relative"
+                    pointerEvents="hover"
+                    data-x={x}
+                    data-y={y}
+                    _hover={
+                        {
+                            w:`calc(${shipWidth * 100}% + 2px * ${shipWidth - 1})`,
+                            h:`calc(${shipHeight * 100}% + 2px * ${shipHeight - 1})`,
+                            bg:"blue.100"
+                        }
+                    }
 
-    });
+                     />
+            )
+
+    }
+}
+
+
+function renderCell(i, filledSpots, hitSpots, missedSpots, handleTileClick, shipList, rotation, gamePhase) {
+    const x = i % 7;
+    const y = Math.floor(i / 7);
+    const isHit = hitSpots.some((spot) => spot[0] === x && spot[1] === y);
+    const isMissed = missedSpots.some((spot) => spot[0] === x && spot[1] === y);
+    const isFilled = filledSpots.some((spot) => spot[0] === x && spot[1] === y);
+
+
+    if (isHit) {
+        return <Box key={uniqid()} data-x={x} data-y={y} w='calc(100% / 7)' h='calc(100% / 7)' bg="red.300" borderWidth="1px" />;
+    }
+    if (isMissed) {
+        return <Box key={uniqid()} data-x={x} data-y={y} w='calc(100% / 7)' h='calc(100% / 7)' bg="gray.600" borderWidth="1px"/>;
+    } 
+    if (isFilled) {
+        return <Box key={uniqid()} data-x={x} data-y={y} onClick={handleTileClick} w='calc(100% / 7)' h='calc(100% / 7)' bg="blue.300" borderWidth="1px"/>;
+    }
+    return <Box key={uniqid()} data-x={x} data-y={y} onClick={handleTileClick} w='calc(100% / 7)' h='calc(100% / 7)' bg="white" borderWidth="1px">
+        <CellHover x={x} y={y} shipList={shipList} rotation={rotation} gamePhase={gamePhase} isHit={isHit} isFilled={isFilled} />
+        </Box>;
+
+
+}
+
+
+function BattleshipGrid({playerTurn, handleTileClick, player, rotation, shipList, gamePhase,  ...other}) {
+
+
+    // console.log(handleTileClick);
+
+    const filledSpots = player.gameBoard.getFilledSpots() || [];
+    const hitSpots = player.gameBoard.getHitSpots() || [];
+    const missedSpots = player.gameBoard.getMissedSpots() || [];
+    
+
+    const cells = [];
+    for (let i = 0; i < 49; i++) {
+        cells.push(renderCell(i, filledSpots, hitSpots, missedSpots, handleTileClick, shipList, rotation, gamePhase));
+    }
 
     const highlightBoard = (user) => {
         if (user === null) return '1px';
@@ -44,8 +94,8 @@ function BattleshipGrid({playerTurn, handleTileClick, player, ...other}) {
     };
 
     return (
-        <Box id={player} display='flex' flexDirection='column' alignItems='center' borderWidth={highlightBoard(player)} borderColor="gray.900" shadow="base" {...other}>
-            {setupBoard}
+        <Box id={player.getName()} display='flex' flexDirection='row' flexWrap="wrap" borderWidth={highlightBoard(player.getName())} borderColor="gray.900" shadow="base" {...other}>
+            {cells}
         </Box>
 
     )

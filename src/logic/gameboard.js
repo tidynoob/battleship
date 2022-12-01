@@ -5,6 +5,7 @@ const gameboard = () => {
 
   const _hitSpots = [];
   const _missedSpots = [];
+  const _filledSpots = [];
 
   const _shipCount = {
     carrier: {
@@ -53,17 +54,43 @@ const gameboard = () => {
 
   const getMissedSpots = () => _missedSpots;
 
+  const getFilledSpots = () => _filledSpots;
+
   const _makeID = () => _count++;
+
+  const isShipPlacable = (x, y, length, direction) => {
+    if (direction === 'h') {
+      if (x + length > 6) return false;
+      for (let i = 0; i < length; i++) {
+        if (board[y][x + i] !== null) return false;
+      }
+    } else if (direction === 'v') {
+      if (y + length > 6) return false;
+      for (let i = 0; i < length; i++) {
+        if (board[y + i][x] !== null) return false;
+      }
+    }
+    return true;
+  };
+
+
 
   const placeShip = (x, y, length, direction) => {
     // check if there's already a ship there
     for (let i = 0; i < length; i++) {
       if (direction === 'v') {
         if (board[y + i][x] !== null) {
+          console.log(x, y + i);
+          console.log('error');
+
           return false;
         }
       } else if (direction === 'h') {
         if (board[y][x + i] !== null) {
+          console.log(x, y + i);
+
+          console.log('error');
+
           return false;
         }
       }
@@ -73,13 +100,14 @@ const gameboard = () => {
     for (let i = 0; i < length; i++) {
       if (direction === 'v') {
         board[y + i][x] = ship(length, ID);
+        _filledSpots.push([x, y + i]);
       } else if (direction === 'h') {
         board[y][x + i] = ship(length, ID);
-      } else {
-        return false;
-      }
+        _filledSpots.push([x + i, y]);
+      } 
     }
-    return true;
+    console.log(board);
+    return board;
   };
 
   const hit = (x, y) => {
@@ -115,7 +143,7 @@ const gameboard = () => {
   };
 
   return {
-    board, placeShip, hit, getHitSpots, getMissedSpots, allSunk, resetBoard, getShipCount, allShipsPlaced
+    board, placeShip, hit, getHitSpots, getMissedSpots, getFilledSpots, allSunk, resetBoard, getShipCount, allShipsPlaced, isShipPlacable
   };
 };
 
