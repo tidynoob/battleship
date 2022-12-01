@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import { Box, Button, Heading, useBoolean, useDisclosure } from "@chakra-ui/react";
 import uniqid from 'uniqid';
 // import gameController from "../logic/gameController";
@@ -7,7 +7,7 @@ import BattleShipGrid from "./BattleshipGrid";
 import UserBox from "./UserBox";
 import PlacementModal from "./PlacementModal";
 
-const ships = [
+const shipList = [
     {
         shipName: 'carrier',
         length: 5,
@@ -41,7 +41,19 @@ function Main() {
     const [playerTurn, setPlayerTurn] = useState('');
     const [rotation, setRotation] = useState('h');
     const { isOpen, onOpen, onClose } = useDisclosure({isOpen: true});
-    const [shipList, setShipList] = useState(ships);
+    // const [shipList, setShipList] = useState(ships);
+    const [shipIndex, setShipIndex] = useState(0);
+
+    // console.log(gameStatus)
+    // console.log(playerTurn);
+
+    useEffect(() => {
+        if (gamePhase === 'active') {
+            setGameStatus(`${playerTurn}'s turn`);
+        } else if (gamePhase === 'gameOver') {
+            setGameStatus(`${playerTurn} wins!`);
+        }
+    }, [gamePhase, playerTurn])
 
     const toggleRotation = () => {
         if (rotation === 'h') {
@@ -51,7 +63,7 @@ function Main() {
         }
     };
 
-    const startGame = () => {
+    const startGame = async () => {
         onClose();
         setGamePhase('active');
         setPlayerTurn(player1.getName());
@@ -78,7 +90,7 @@ function Main() {
     const handleTileClick = (e) => {
         const x = parseInt(e.target.getAttribute('data-x'), 10);
         const y = parseInt(e.target.getAttribute('data-y'), 10);
-        console.log(x,y);
+        // console.log(x,y);
 
         
         if (gamePhase === 'active') {
@@ -88,15 +100,17 @@ function Main() {
         };
 
         if (gamePhase === 'placement') {
-            console.log(player1.gameBoard)
-            if (!player1.gameBoard.isShipPlacable(x, y, shipList[0].length, rotation)) {
+            // console.log(player1.gameBoard.board)
+            if (!player1.gameBoard.isShipPlacable(x, y, shipList[shipIndex].length, rotation)) {
                 return
             }
 
-            const newBoard = player1.gameBoard.placeShip(x, y, shipList[0].length, rotation);
+            const newBoard = player1.gameBoard.placeShip(x, y, shipList[shipIndex].length, rotation);
             setPlayer1({...player1, gameBoard: {...player1.gameBoard, board: newBoard}});
-            setShipList(shipList.slice(1));
-            if (shipList.length === 0) {
+            setShipIndex(shipIndex + 1);
+
+            if (shipIndex >= shipList.length - 1) {
+                console.log('game starting');
                 startGame();
             }
 
@@ -113,14 +127,14 @@ function Main() {
 
     return (
         <>
-        <PlacementModal shipList={shipList} gamePhase={gamePhase}  isOpen={isOpen} onClose={onClose} rotation={rotation} toggleRotation={toggleRotation} handleTileClick={handleTileClick} player={player1} />
+        {gamePhase === 'placement' && <PlacementModal currShip={shipList[shipIndex]} gamePhase={gamePhase}  isOpen={isOpen} onClose={onClose} rotation={rotation} toggleRotation={toggleRotation} handleTileClick={handleTileClick} player={player1} />}
         <Box display='grid' gridTemplateColumns="350px 350px" p={4} gap='4' gridAutoRows="auto" maxW="container.lg" alignItems="center" margin="auto" >
             {/* <Button justifySelf="flex-end" colorScheme="gray" variant="solid" w='250px' onClick={startGame} isDisabled={startButtonDisabled}>Start</Button> */}
             {/* <Button justifySelf="flex-start" colorScheme="gray" variant="outline" w='250px' onClick={resetGame} isDisabled={resetButtonDisabled}>Reset</Button> */}
             <Heading justifySelf="center" gridColumn="1" size="md">{player1.getName()}</Heading>
             <Heading justifySelf="center" gridColumn="2" size="md">{player2.getName()}</Heading>
-            <BattleShipGrid shipList={shipList} gamePhase={gamePhase} rotation={rotation} playerTurn={playerTurn} handleTileClick={handleTileClick} player={player1} gridColumn='1' h='sm' w='sm' justifySelf='flex-end' />
-            <BattleShipGrid shipList={shipList} gamePhase={gamePhase} rotation={rotation} playerTurn={playerTurn} handleTileClick={handleTileClick} player={player2} gridColumn='2' h='sm' w='sm' justifySelf='flex-start' />
+            <BattleShipGrid currShip={shipList[shipIndex]} gamePhase={gamePhase} rotation={rotation} playerTurn={playerTurn} handleTileClick={handleTileClick} player={player1} gridColumn='1' h='sm' w='sm' justifySelf='flex-end' />
+            <BattleShipGrid currShip={shipList[shipIndex]} gamePhase={gamePhase} rotation={rotation} playerTurn={playerTurn} handleTileClick={handleTileClick} player={player2} gridColumn='2' h='sm' w='sm' justifySelf='flex-start' />
             <Heading justifySelf="center" gridColumn="1/-1" size='lg'>{gameStatus}</Heading>
 
         </Box>

@@ -2,9 +2,9 @@ import React from "react";
 import { Box } from "@chakra-ui/react";
 import uniqid from 'uniqid';
 
-function CellHover({x, y, shipList, rotation, gamePhase, isHit, isFilled}) {
-    // console.log(x, y, shipList, rotation, gamePhase, isHit, isFilled);
-    const ship = shipList[0];
+function CellHover({x, y, currShip = {length: 1}, rotation, gamePhase, isFilled}) {
+    // console.log(x, y, shipList, rotation, gamePhase, isFilled);
+    const ship = currShip;
     let shipWidth;
     let shipHeight;
     if (rotation === 'h') {
@@ -44,7 +44,7 @@ function CellHover({x, y, shipList, rotation, gamePhase, isHit, isFilled}) {
 }
 
 
-function renderCell(i, filledSpots, hitSpots, missedSpots, handleTileClick, shipList, rotation, gamePhase) {
+function renderCell(i, filledSpots, hitSpots, missedSpots, handleTileClick, currShip, rotation, gamePhase) {
     const x = i % 7;
     const y = Math.floor(i / 7);
     const isHit = hitSpots.some((spot) => spot[0] === x && spot[1] === y);
@@ -62,14 +62,14 @@ function renderCell(i, filledSpots, hitSpots, missedSpots, handleTileClick, ship
         return <Box key={uniqid()} data-x={x} data-y={y} onClick={handleTileClick} w='calc(100% / 7)' h='calc(100% / 7)' bg="blue.300" borderWidth="1px"/>;
     }
     return <Box key={uniqid()} data-x={x} data-y={y} onClick={handleTileClick} w='calc(100% / 7)' h='calc(100% / 7)' bg="white" borderWidth="1px">
-        <CellHover x={x} y={y} shipList={shipList} rotation={rotation} gamePhase={gamePhase} isHit={isHit} isFilled={isFilled} />
+        <CellHover x={x} y={y} currShip={currShip} rotation={rotation} gamePhase={gamePhase} isHit={isHit} isFilled={isFilled} />
         </Box>;
 
 
 }
 
 
-function BattleshipGrid({playerTurn, handleTileClick, player, rotation, shipList, gamePhase,  ...other}) {
+function BattleshipGrid({playerTurn, handleTileClick, player, rotation, currShip, gamePhase,  ...other}) {
 
 
     // console.log(handleTileClick);
@@ -81,7 +81,7 @@ function BattleshipGrid({playerTurn, handleTileClick, player, rotation, shipList
 
     const cells = [];
     for (let i = 0; i < 49; i++) {
-        cells.push(renderCell(i, filledSpots, hitSpots, missedSpots, handleTileClick, shipList, rotation, gamePhase));
+        cells.push(renderCell(i, filledSpots, hitSpots, missedSpots, handleTileClick, currShip, rotation, gamePhase));
     }
 
     const highlightBoard = (user) => {

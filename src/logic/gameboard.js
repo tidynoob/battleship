@@ -60,12 +60,12 @@ const gameboard = () => {
 
   const isShipPlacable = (x, y, length, direction) => {
     if (direction === 'h') {
-      if (x + length > 6) return false;
+      if (x + length > 7) return false;
       for (let i = 0; i < length; i++) {
         if (board[y][x + i] !== null) return false;
       }
     } else if (direction === 'v') {
-      if (y + length > 6) return false;
+      if (y + length > 7) return false;
       for (let i = 0; i < length; i++) {
         if (board[y + i][x] !== null) return false;
       }
