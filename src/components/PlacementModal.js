@@ -6,6 +6,8 @@ import BattleshipGrid from './BattleshipGrid'
 
 function PlacementModal({isOpen, onClose, player, playerTurn, toggleRotation, handleTileClick, rotation, gamePhase, currShip}) {
 
+  if (gamePhase !== 'placement') return null;
+
   if (currShip === undefined) {
     return (
       <Modal isOpen={isOpen} onClose={onClose}>

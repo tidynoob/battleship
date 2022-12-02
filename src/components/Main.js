@@ -31,29 +31,20 @@ const shipList = [
 ]
 
 function Main() {
-    const [gameStatus, setGameStatus] = useState('');
     const [resetButtonDisabled, setResetButtonDisabled] = useBoolean(true);
     const [player1, setPlayer1] = useState(player('Player 1'));
     const [player2, setPlayer2] = useState(player('Computer'));
-    // const [player1Name, setPlayer1Name] = useState();
-    // const [turnCount, setTurnCount] = useState(0);
     const [gamePhase, setGamePhase] = useState('placement');
+    const [turnCount, setTurnCount] = useState(0);
     const [playerTurn, setPlayerTurn] = useState('');
     const [rotation, setRotation] = useState('h');
     const { isOpen, onOpen, onClose } = useDisclosure({isOpen: true});
-    // const [shipList, setShipList] = useState(ships);
     const [shipIndex, setShipIndex] = useState(0);
 
-    // console.log(gameStatus)
-    // console.log(playerTurn);
-
     useEffect(() => {
-        if (gamePhase === 'active') {
-            setGameStatus(`${playerTurn}'s turn`);
-        } else if (gamePhase === 'gameOver') {
-            setGameStatus(`${playerTurn} wins!`);
-        }
-    }, [gamePhase, playerTurn])
+        const pt = turnCount % 2 === 0 ? player1.getName() : player2.getName();
+        setPlayerTurn(pt);
+    }, [turnCount]);
 
     const toggleRotation = () => {
         if (rotation === 'h') {
@@ -67,35 +58,31 @@ function Main() {
         onClose();
         setGamePhase('active');
         setPlayerTurn(player1.getName());
-        setGameStatus(`${playerTurn}'s turn`);
         setResetButtonDisabled.off();
         onClose();
     };
 
-    // const takeTurn = (x,y) => {
-    //     if (gamePhase !== 'active') return;
-    //     if (playerTurn === player1.getName()) {
-    //         player1.attack(player2, x, y);
-    //     } else {
-    //         player2.attack(player1, x, y);
-    //     };
-    //     setTurnCount(turnCount + 1);
-    //     if (turnCount % 2 === 0) {
-    //         setPlayerTurn(player1.getName());
-    //     } else {
-    //         setPlayerTurn(player2.getName());
-    //     };
-    // };
+    const takeTurn = (x,y) => {
+        if (gamePhase !== 'active') return;
+        if (playerTurn === player1.getName()) {
+            const newBoard = player1.attack(player2, x, y);
+            setPlayer2({ ...player2, gameBoard: { ...player2.gameBoard, board: newBoard } });
+        } else {
+            const newBoard = player2.attack(player1, x, y);
+            setPlayer1({ ...player1, gameBoard: { ...player1.gameBoard, board: newBoard } });
 
-    const handleTileClick = (e) => {
+        };
+        setTurnCount(tc => tc + 1);
+    };
+
+    const handleTileClick = (e, user) => {
         const x = parseInt(e.target.getAttribute('data-x'), 10);
         const y = parseInt(e.target.getAttribute('data-y'), 10);
-        // console.log(x,y);
 
-        
         if (gamePhase === 'active') {
-            // takeTurn(x,y);
-            setGameStatus(`${playerTurn}'s turn`);
+            if (user.getName() !== playerTurn) {
+                takeTurn(x,y);
+            }
             return
         };
 
@@ -117,17 +104,9 @@ function Main() {
         }
     };
 
-    // const hoverTile = (e) => {
-    //     const x = e.target.getAttribute('data-x');
-    //     const y = e.target.getAttribute('data-y');
-
-    // };
-
-
-
     return (
         <>
-        {gamePhase === 'placement' && <PlacementModal currShip={shipList[shipIndex]} gamePhase={gamePhase}  isOpen={isOpen} onClose={onClose} rotation={rotation} toggleRotation={toggleRotation} handleTileClick={handleTileClick} player={player1} />}
+        <PlacementModal currShip={shipList[shipIndex]} gamePhase={gamePhase}  isOpen={isOpen} onClose={onClose} rotation={rotation} toggleRotation={toggleRotation} handleTileClick={handleTileClick} player={player1} />
         <Box display='grid' gridTemplateColumns="350px 350px" p={4} gap='4' gridAutoRows="auto" maxW="container.lg" alignItems="center" margin="auto" >
             {/* <Button justifySelf="flex-end" colorScheme="gray" variant="solid" w='250px' onClick={startGame} isDisabled={startButtonDisabled}>Start</Button> */}
             {/* <Button justifySelf="flex-start" colorScheme="gray" variant="outline" w='250px' onClick={resetGame} isDisabled={resetButtonDisabled}>Reset</Button> */}
@@ -135,7 +114,7 @@ function Main() {
             <Heading justifySelf="center" gridColumn="2" size="md">{player2.getName()}</Heading>
             <BattleShipGrid currShip={shipList[shipIndex]} gamePhase={gamePhase} rotation={rotation} playerTurn={playerTurn} handleTileClick={handleTileClick} player={player1} gridColumn='1' h='sm' w='sm' justifySelf='flex-end' />
             <BattleShipGrid currShip={shipList[shipIndex]} gamePhase={gamePhase} rotation={rotation} playerTurn={playerTurn} handleTileClick={handleTileClick} player={player2} gridColumn='2' h='sm' w='sm' justifySelf='flex-start' />
-            <Heading justifySelf="center" gridColumn="1/-1" size='lg'>{gameStatus}</Heading>
+            {/* <Heading justifySelf="center" gridColumn="1/-1" size='lg'>{gameStatus}</Heading> */}
 
         </Box>
         </>

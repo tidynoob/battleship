@@ -43,14 +43,12 @@ function CellHover({x, y, currShip = {length: 1}, rotation, gamePhase, isFilled}
     }
 }
 
-
-function renderCell(i, filledSpots, hitSpots, missedSpots, handleTileClick, currShip, rotation, gamePhase) {
+function renderCell(i, filledSpots, hitSpots, missedSpots, handleTileClick, currShip, rotation, gamePhase, player, ) {
     const x = i % 7;
     const y = Math.floor(i / 7);
     const isHit = hitSpots.some((spot) => spot[0] === x && spot[1] === y);
     const isMissed = missedSpots.some((spot) => spot[0] === x && spot[1] === y);
     const isFilled = filledSpots.some((spot) => spot[0] === x && spot[1] === y);
-
 
     if (isHit) {
         return <Box key={uniqid()} data-x={x} data-y={y} w='calc(100% / 7)' h='calc(100% / 7)' bg="red.300" borderWidth="1px" />;
@@ -59,9 +57,9 @@ function renderCell(i, filledSpots, hitSpots, missedSpots, handleTileClick, curr
         return <Box key={uniqid()} data-x={x} data-y={y} w='calc(100% / 7)' h='calc(100% / 7)' bg="gray.600" borderWidth="1px"/>;
     } 
     if (isFilled) {
-        return <Box key={uniqid()} data-x={x} data-y={y} onClick={handleTileClick} w='calc(100% / 7)' h='calc(100% / 7)' bg="blue.300" borderWidth="1px"/>;
+        return <Box key={uniqid()} data-x={x} data-y={y} onClick={(e) => handleTileClick(e, player)} w='calc(100% / 7)' h='calc(100% / 7)' bg="blue.300" borderWidth="1px"/>;
     }
-    return <Box key={uniqid()} data-x={x} data-y={y} onClick={handleTileClick} w='calc(100% / 7)' h='calc(100% / 7)' bg="white" borderWidth="1px">
+    return <Box key={uniqid()} data-x={x} data-y={y} onClick={(e) => handleTileClick(e, player)} w='calc(100% / 7)' h='calc(100% / 7)' bg="white" borderWidth="1px">
         <CellHover x={x} y={y} currShip={currShip} rotation={rotation} gamePhase={gamePhase} isHit={isHit} isFilled={isFilled} />
         </Box>;
 
@@ -70,8 +68,6 @@ function renderCell(i, filledSpots, hitSpots, missedSpots, handleTileClick, curr
 
 
 function BattleshipGrid({playerTurn, handleTileClick, player, rotation, currShip, gamePhase,  ...other}) {
-
-
     // console.log(handleTileClick);
 
     const filledSpots = player.gameBoard.getFilledSpots() || [];
@@ -81,7 +77,7 @@ function BattleshipGrid({playerTurn, handleTileClick, player, rotation, currShip
 
     const cells = [];
     for (let i = 0; i < 49; i++) {
-        cells.push(renderCell(i, filledSpots, hitSpots, missedSpots, handleTileClick, currShip, rotation, gamePhase));
+        cells.push(renderCell(i, filledSpots, hitSpots, missedSpots, handleTileClick, currShip, rotation, gamePhase, player, playerTurn));
     }
 
     const highlightBoard = (user) => {

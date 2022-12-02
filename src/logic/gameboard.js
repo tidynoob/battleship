@@ -112,15 +112,15 @@ const gameboard = () => {
 
   const hit = (x, y) => {
     if (_missedSpots.some((spot) => arraysEqual(spot, [x, y]))) {
-      throw new Error('Location already missed');
+      return board;
     }
     if (board[y][x] === null) {
       _missedSpots.push([x, y]);
-      throw new Error('No ship at that location');
+      return board;
     }
 
     if (_hitSpots.some((spot) => arraysEqual(spot, [x, y]))) {
-      throw new Error('Location already hit');
+      return board;
     }
     const ID = board[y][x].getID();
     board.map((row) => row.map((cell) => {
@@ -130,7 +130,7 @@ const gameboard = () => {
       return cell;
     }));
     _hitSpots.push([x, y]);
-    return true;
+    return board;
   };
 
   const allSunk = () => board.every((row) => row.every((cell) => cell === null || cell.isSunk()));
