@@ -1,11 +1,12 @@
 import React, {useState, useEffect} from "react";
 import { Box, Button, Heading, useBoolean, useDisclosure } from "@chakra-ui/react";
-import uniqid from 'uniqid';
+// import uniqid from 'uniqid';
 // import gameController from "../logic/gameController";
 import player from "../logic/player";
 import BattleShipGrid from "./BattleshipGrid";
-import UserBox from "./UserBox";
+// import UserBox from "./UserBox";
 import PlacementModal from "./PlacementModal";
+import bot from "../logic/botLogic";
 
 const shipList = [
     {
@@ -30,6 +31,8 @@ const shipList = [
     }
 ]
 
+const computer = bot();
+
 function Main() {
     const [resetButtonDisabled, setResetButtonDisabled] = useBoolean(true);
     const [player1, setPlayer1] = useState(player('Player 1'));
@@ -41,25 +44,15 @@ function Main() {
     const { isOpen, onOpen, onClose } = useDisclosure({isOpen: true});
     const [shipIndex, setShipIndex] = useState(0);
 
-    useEffect(() => {
-        const pt = turnCount % 2 === 0 ? player1.getName() : player2.getName();
-        setPlayerTurn(pt);
-    }, [turnCount]);
-
-    const toggleRotation = () => {
-        if (rotation === 'h') {
-            setRotation('v');
-        } else {
-            setRotation('h');
-        }
-    };
-
-    const startGame = async () => {
-        onClose();
-        setGamePhase('active');
-        setPlayerTurn(player1.getName());
-        setResetButtonDisabled.off();
-        onClose();
+    const checkWinner = () => {
+        if (player1.gameBoard.allSunk()) {
+            return player2.getName();
+        } 
+        if (player2.gameBoard.allSunk()) {
+            return player1.getName();
+        } 
+        return null;
+        
     };
 
     const takeTurn = (x,y) => {
@@ -73,6 +66,59 @@ function Main() {
 
         };
         setTurnCount(tc => tc + 1);
+    };
+
+    useEffect(() => {
+        const pt = turnCount % 2 === 0 ? player1.getName() : player2.getName();
+        setPlayerTurn(pt);
+
+        if (gamePhase === 'active') {
+            const winner = checkWinner();
+            // console.log(winner);
+            if (winner !== null) {
+                console.log(winner, 'wins!');
+                setGamePhase('over');
+                onOpen();
+            }
+        }
+
+
+    }, [turnCount]);
+
+    useEffect(() => {
+        if (playerTurn === player2.getName()) {
+            const [x,y] = computer.makeGuess(player1.gameBoard.getGuessableSpots());
+            takeTurn(x,y);
+        }
+    }, [playerTurn]);
+
+    const toggleRotation = () => {
+        if (rotation === 'h') {
+            setRotation('v');
+        } else {
+            setRotation('h');
+        }
+    };
+
+    const startGame = () => {
+        onClose();
+        setPlayer2({ ...player2, gameBoard: { ...player2.gameBoard, board: computer.placeShips(shipList, player2.gameBoard) } });
+        setGamePhase('active');
+        setPlayerTurn(player1.getName());
+        setResetButtonDisabled.off();
+        onClose();
+    };
+
+    const resetGame = () => {
+        setPlayer1(player('Player 1'));
+        setPlayer2(player('Computer'));
+        setGamePhase('placement');
+        setTurnCount(0);
+        setPlayerTurn('');
+        setRotation('h');
+        setShipIndex(0);
+        setResetButtonDisabled.on();
+        onOpen();
     };
 
     const handleTileClick = (e, user) => {

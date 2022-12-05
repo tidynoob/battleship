@@ -17,6 +17,7 @@
     "no-underscore-dangle": "off",
     "no-console": "off",
     "no-unused-vars": "off",
-    "react/jsx-props-no-spreading": "off"
+    "react/jsx-props-no-spreading": "off",
+    "no-continue": "off"
   }
 }

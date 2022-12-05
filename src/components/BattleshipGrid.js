@@ -89,8 +89,16 @@ function BattleshipGrid({playerTurn, handleTileClick, player, rotation, currShip
         
     };
 
+    const boardOpacity = (user) => {
+        if (user === null) return '1';
+        if (playerTurn === user) {
+            return '0.5'
+        }
+            return '1'
+    }
+
     return (
-        <Box id={player.getName()} display='flex' flexDirection='row' flexWrap="wrap" borderWidth={highlightBoard(player.getName())} borderColor="gray.900" shadow="base" {...other}>
+        <Box id={player.getName()} display='flex' flexDirection='row' flexWrap="wrap" opacity={boardOpacity(player.getName())} borderWidth="3px" borderColor="gray.900" shadow="base" {...other}>
             {cells}
         </Box>
 

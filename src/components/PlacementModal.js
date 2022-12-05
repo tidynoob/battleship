@@ -6,6 +6,21 @@ import BattleshipGrid from './BattleshipGrid'
 
 function PlacementModal({isOpen, onClose, player, playerTurn, toggleRotation, handleTileClick, rotation, gamePhase, currShip}) {
 
+  // console.log('gamePhase: ', gamePhase)
+
+  if (gamePhase === 'over') {
+    return (
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay>
+          <ModalContent>
+            <ModalHeader textAlign="center">Game Over</ModalHeader>
+            <ModalBody />
+          </ModalContent>
+        </ModalOverlay>
+      </Modal>
+    )
+  }
+
   if (gamePhase !== 'placement') return null;
 
   if (currShip === undefined) {
