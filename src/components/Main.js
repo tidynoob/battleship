@@ -34,8 +34,7 @@ const shipList = [
 const computer = bot();
 
 function Main() {
-    const [resetButtonDisabled, setResetButtonDisabled] = useBoolean(true);
-    const [player1, setPlayer1] = useState(player('Player 1'));
+    const [player1, setPlayer1] = useState(player('Player'));
     const [player2, setPlayer2] = useState(player('Computer'));
     const [gamePhase, setGamePhase] = useState('placement');
     const [turnCount, setTurnCount] = useState(0);
@@ -76,7 +75,7 @@ function Main() {
             const winner = checkWinner();
             // console.log(winner);
             if (winner !== null) {
-                console.log(winner, 'wins!');
+                // console.log(winner, 'wins!');
                 setGamePhase('over');
                 onOpen();
             }
@@ -88,7 +87,7 @@ function Main() {
     useEffect(() => {
         if (playerTurn === player2.getName()) {
             const [x,y] = computer.makeGuess(player1.gameBoard.getGuessableSpots());
-            takeTurn(x,y);
+            setTimeout(() => takeTurn(x,y), 500);
         }
     }, [playerTurn]);
 
@@ -105,7 +104,6 @@ function Main() {
         setPlayer2({ ...player2, gameBoard: { ...player2.gameBoard, board: computer.placeShips(shipList, player2.gameBoard) } });
         setGamePhase('active');
         setPlayerTurn(player1.getName());
-        setResetButtonDisabled.off();
         onClose();
     };
 
@@ -117,7 +115,6 @@ function Main() {
         setPlayerTurn('');
         setRotation('h');
         setShipIndex(0);
-        setResetButtonDisabled.on();
         onOpen();
     };
 
@@ -143,7 +140,7 @@ function Main() {
             setShipIndex(shipIndex + 1);
 
             if (shipIndex >= shipList.length - 1) {
-                console.log('game starting');
+                // console.log('game starting');
                 startGame();
             }
 
@@ -152,7 +149,7 @@ function Main() {
 
     return (
         <>
-        <PlacementModal currShip={shipList[shipIndex]} gamePhase={gamePhase}  isOpen={isOpen} onClose={onClose} rotation={rotation} toggleRotation={toggleRotation} handleTileClick={handleTileClick} player={player1} />
+        <PlacementModal currShip={shipList[shipIndex]} gamePhase={gamePhase}  isOpen={isOpen} onClose={onClose} rotation={rotation} toggleRotation={toggleRotation} handleTileClick={handleTileClick} player={player1} resetGame={resetGame} />
         <Box display='grid' gridTemplateColumns="350px 350px" p={4} gap='4' gridAutoRows="auto" maxW="container.lg" alignItems="center" margin="auto" >
             {/* <Button justifySelf="flex-end" colorScheme="gray" variant="solid" w='250px' onClick={startGame} isDisabled={startButtonDisabled}>Start</Button> */}
             {/* <Button justifySelf="flex-start" colorScheme="gray" variant="outline" w='250px' onClick={resetGame} isDisabled={resetButtonDisabled}>Reset</Button> */}

@@ -44,15 +44,15 @@ const gameboard = () => {
     if (direction === 'h') {
       if (x + length > 7) return false;
       for (let i = 0; i < length; i++) {
-        console.log('spot: ', x + i, y);
-        console.log('value: ', board[y][x + i]);
+        // console.log('spot: ', x + i, y);
+        // console.log('value: ', board[y][x + i]);
         if (board[y][x + i] !== null) return false;
       }
     } else if (direction === 'v') {
       if (y + length > 7) return false;
       for (let i = 0; i < length; i++) {
-        console.log('spot: ', x, y + i);
-        console.log('value: ', board[y + i][x]);
+        // console.log('spot: ', x, y + i);
+        // console.log('value: ', board[y + i][x]);
         if (board[y + i][x] !== null) return false;
       }
     }

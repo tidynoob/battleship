@@ -27,6 +27,7 @@ function CellHover({x, y, currShip = {length: 1}, rotation, gamePhase, isFilled}
                     w="100%"
                     position="relative"
                     pointerEvents="hover"
+                    cursor='pointer'
                     data-x={x}
                     data-y={y}
                     _hover={
@@ -57,11 +58,26 @@ function renderCell(i, filledSpots, hitSpots, missedSpots, handleTileClick, curr
         return <Box key={uniqid()} data-x={x} data-y={y} w='calc(100% / 7)' h='calc(100% / 7)' bg="gray.600" borderWidth="1px"/>;
     } 
     if (isFilled) {
-        return <Box key={uniqid()} data-x={x} data-y={y} onClick={(e) => handleTileClick(e, player)} w='calc(100% / 7)' h='calc(100% / 7)' bg="blue.300" borderWidth="1px"/>;
+        if (player.getName() === 'Computer') {
+            return <Box key={uniqid()} data-x={x} data-y={y} cursor='pointer' _hover={{bg:'gray.300'}} onClick={(e) => handleTileClick(e, player)} w='calc(100% / 7)' h='calc(100% / 7)' bg="white" borderWidth="1px"/>;
+        } 
+            return <Box key={uniqid()} data-x={x} data-y={y} w='calc(100% / 7)' h='calc(100% / 7)' bg="blue.300" borderWidth="1px">
+            <CellHover x={x} y={y} currShip={currShip} rotation={rotation} gamePhase={gamePhase} isHit={isHit} isFilled={isFilled} />
+            </Box>;
+        
     }
-    return <Box key={uniqid()} data-x={x} data-y={y} onClick={(e) => handleTileClick(e, player)} w='calc(100% / 7)' h='calc(100% / 7)' bg="white" borderWidth="1px">
-        <CellHover x={x} y={y} currShip={currShip} rotation={rotation} gamePhase={gamePhase} isHit={isHit} isFilled={isFilled} />
-        </Box>;
+
+    if (player.getName() === 'Computer' || gamePhase === 'placement') {
+        return <Box key={uniqid()} data-x={x} data-y={y} cursor='pointer' _hover={{bg:'gray.300'}} onClick={(e) => handleTileClick(e, player)} w='calc(100% / 7)' h='calc(100% / 7)' bg="white" borderWidth="1px">
+            <CellHover x={x} y={y} currShip={currShip} rotation={rotation} gamePhase={gamePhase} isHit={isHit} isFilled={isFilled} />
+            </Box>;
+
+    }
+
+    return <Box key={uniqid()} data-x={x} data-y={y} w='calc(100% / 7)' h='calc(100% / 7)' bg="white" borderWidth="1px">
+            <CellHover x={x} y={y} currShip={currShip} rotation={rotation} gamePhase={gamePhase} isHit={isHit} isFilled={isFilled} />
+            </Box>;
+    
 
 
 }

@@ -1,12 +1,14 @@
 import React from 'react'
-import { Box, Button, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, ModalFooter} from '@chakra-ui/react'
+import { Box, Button, Modal, ModalBody, Heading, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, ModalFooter} from '@chakra-ui/react'
 import BattleshipGrid from './BattleshipGrid'
 
 
 
-function PlacementModal({isOpen, onClose, player, playerTurn, toggleRotation, handleTileClick, rotation, gamePhase, currShip}) {
+function PlacementModal({isOpen, onClose, player, playerTurn, toggleRotation, handleTileClick, rotation, gamePhase, currShip, resetGame}) {
 
   // console.log('gamePhase: ', gamePhase)
+
+  const winner = playerTurn === player.getName() ? 'Computer Wins!' : 'You Win!';
 
   if (gamePhase === 'over') {
     return (
@@ -14,7 +16,11 @@ function PlacementModal({isOpen, onClose, player, playerTurn, toggleRotation, ha
         <ModalOverlay>
           <ModalContent>
             <ModalHeader textAlign="center">Game Over</ModalHeader>
-            <ModalBody />
+            <ModalBody display="flex" flexDir='column' alignItems="center" gap="4">
+              <Heading size="md">{winner}</Heading>
+              <Button colorScheme="gray" onClick={resetGame}>Play Again</Button>
+            </ModalBody>
+            <ModalFooter />
           </ModalContent>
         </ModalOverlay>
       </Modal>
